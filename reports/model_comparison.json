@@ -1,0 +1,22 @@
+{
+  "baseline": {
+    "latency": {
+      "max_ms": 0.359599944204092,
+      "mean_ms": 0.07680832641199231,
+      "median_ms": 0.042050029151141644,
+      "min_ms": 0.036499928683042526,
+      "p95_ms": 0.359599944204092
+    },
+    "macro_f1": 0.6488095238095238,
+    "macro_precision": 0.7291666666666666,
+    "macro_recall": 0.6666666666666666,
+    "model_name": "numpy_tfidf_logreg",
+    "roc_auc_ovr": 0.9166666666666666,
+    "status": "computed",
+    "weighted_f1": 0.6488095238095238
+  },
+  "transformer": {
+    "reason": "Run `python -m src.train_transformer` after installing transformer dependencies.",
+    "status": "not_run"
+  }
+}

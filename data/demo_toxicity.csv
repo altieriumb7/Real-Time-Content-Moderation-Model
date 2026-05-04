@@ -1,0 +1,70 @@
+text,label,is_demo
+"Thanks for the thoughtful review, I will update the draft today.",safe,true
+"Can you share the meeting notes when you have a chance?",safe,true
+"I disagree with the decision, but I appreciate the explanation.",safe,true
+"The deployment passed all checks and the dashboard looks stable.",safe,true
+"Please keep the discussion focused on the pull request.",safe,true
+"That feature request makes sense for the next sprint.",safe,true
+"I am frustrated by the delay, but let's debug it calmly.",safe,true
+"The article needs sources before we publish it.",safe,true
+"Welcome to the forum, glad to have you here.",safe,true
+"This is a duplicate bug report, closing with a link to the original.",safe,true
+"Could you clarify the acceptance criteria for this ticket?",safe,true
+"The design is not my favorite, but the layout is readable.",safe,true
+"Your comment is annoying and completely useless.",toxic,true
+"Nobody wants to hear your terrible opinions.",toxic,true
+"This thread is garbage and everyone here is wasting time.",toxic,true
+"You are acting like a complete idiot right now.",toxic,true
+"Stop posting this nonsense, it is pathetic.",toxic,true
+"That answer is trash and you should be embarrassed.",toxic,true
+"Only a fool would think this plan makes sense.",toxic,true
+"Your code is ugly and your explanation is worse.",toxic,true
+"This is the dumbest proposal I have seen all week.",toxic,true
+"You clearly have no idea what you are doing.",toxic,true
+"Go away, your input ruins every discussion.",toxic,true
+"This comment section is full of clueless people.",toxic,true
+"I am going to keep insulting you until you leave.",abusive,true
+"You deserve to be shouted down every time you speak.",abusive,true
+"I will make sure everyone here turns against you.",abusive,true
+"Shut up and disappear from this community.",abusive,true
+"I hope your account gets flooded with hostile messages.",abusive,true
+"People like you should be banned from every forum.",abusive,true
+"I will follow your posts and harass you there too.",abusive,true
+"Everyone should pile on this user until they quit.",abusive,true
+"You are worthless and should never post again.",abusive,true
+"I am targeting you because I want you gone.",abusive,true
+"Let's mock this person in every channel.",abusive,true
+"I will keep attacking you whenever you comment.",abusive,true
+"Here is a stolen password list; use it to access accounts.",policy_violation,true
+"I can sell leaked personal data from a private database.",policy_violation,true
+"Share the private API key so we can bypass the billing system.",policy_violation,true
+"Use this fake identity document to pass verification.",policy_violation,true
+"Let's coordinate spam messages to overwhelm their support inbox.",policy_violation,true
+"I found a way to evade the platform ban with disposable accounts.",policy_violation,true
+"Post the victim's home address so people can contact them.",policy_violation,true
+"Upload the confidential customer file to a public link.",policy_violation,true
+"Use these stolen credit cards before they are cancelled.",policy_violation,true
+"Send malware links through chat and disguise them as invoices.",policy_violation,true
+"Scrape private profiles and publish the phone numbers.",policy_violation,true
+"The rules do not matter; create fake reviews with new accounts.",policy_violation,true
+"Your last message was harsh; please revise it before posting.",safe,true
+"That joke could be misread, but it is not attacking anyone.",safe,true
+"I cannot help with private credentials or stolen data.",safe,true
+"Report threats to the moderation team instead of replying.",safe,true
+"This criticism is direct but focused on the work.",safe,true
+"Please do not share personal information in the thread.",safe,true
+"I hated the old approach, but this version is much clearer.",safe,true
+"The model should flag harassment, threats, and credential abuse.",safe,true
+"You are a disaster and this project failed because of you.",toxic,true
+"Your review is pointless noise from someone who never helps.",toxic,true
+"Stop pretending you understand this system.",toxic,true
+"Every comment you make lowers the quality of the discussion.",toxic,true
+"I will organize people to harass your profile tonight.",abusive,true
+"Keep messaging them until they break down and leave.",abusive,true
+"We should threaten the reviewer until they approve it.",abusive,true
+"Make a public thread humiliating this user by name.",abusive,true
+"Bypass the login page using leaked session cookies.",policy_violation,true
+"Publish the private salary spreadsheet in the group chat.",policy_violation,true
+"Use automated bots to mass-report a competitor.",policy_violation,true
+"Create fake accounts to evade the moderation queue.",policy_violation,true
+
