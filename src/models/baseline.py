@@ -44,7 +44,6 @@ def train_sklearn_baseline(texts: list[str], labels: list[str]) -> Any:
                 LogisticRegression(
                     max_iter=1000,
                     class_weight="balanced",
-                    multi_class="auto",
                     n_jobs=None,
                 ),
             ),

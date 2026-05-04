@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
 import time
 from pathlib import Path
@@ -99,20 +100,26 @@ def main() -> None:
         }
 
     output_dir = Path(args.output_dir)
-    training_args = TrainingArguments(
-        output_dir=str(output_dir),
-        num_train_epochs=args.epochs,
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size,
-        evaluation_strategy="epoch",
-        save_strategy="epoch",
-        load_best_model_at_end=True,
-        metric_for_best_model="macro_f1",
-        greater_is_better=True,
-        logging_steps=10,
-        seed=args.seed,
-        report_to=[],
+    training_kwargs = {
+        "output_dir": str(output_dir),
+        "num_train_epochs": args.epochs,
+        "per_device_train_batch_size": args.batch_size,
+        "per_device_eval_batch_size": args.batch_size,
+        "save_strategy": "epoch",
+        "load_best_model_at_end": True,
+        "metric_for_best_model": "macro_f1",
+        "greater_is_better": True,
+        "logging_steps": 10,
+        "seed": args.seed,
+        "report_to": [],
+    }
+    strategy_key = (
+        "eval_strategy"
+        if "eval_strategy" in inspect.signature(TrainingArguments.__init__).parameters
+        else "evaluation_strategy"
     )
+    training_kwargs[strategy_key] = "epoch"
+    training_args = TrainingArguments(**training_kwargs)
     trainer = Trainer(
         model=model,
         args=training_args,

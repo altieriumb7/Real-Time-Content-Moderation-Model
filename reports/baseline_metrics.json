@@ -14,8 +14,8 @@
       0
     ],
     [
-      1,
-      1,
+      0,
+      2,
       1,
       0
     ],
@@ -36,34 +36,34 @@
     },
     "rows": 68
   },
-  "generated_at_unix": 1777815034.8148055,
+  "generated_at_unix": 1777926838.9085348,
   "latencies_ms": [
-    0.3596,
-    0.1109,
-    0.08,
-    0.049,
-    0.0419,
-    0.0409,
-    0.0366,
-    0.0365,
-    0.0429,
-    0.0406,
-    0.0422,
-    0.0406
+    1.5532,
+    1.1146,
+    0.899,
+    0.6681,
+    0.6012,
+    0.6358,
+    0.6329,
+    0.5729,
+    0.5254,
+    0.6213,
+    0.5758,
+    0.5506
   ],
   "latency": {
-    "max_ms": 0.359599944204092,
-    "mean_ms": 0.07680832641199231,
-    "median_ms": 0.042050029151141644,
-    "min_ms": 0.036499928683042526,
-    "p95_ms": 0.359599944204092
+    "max_ms": 1.553199952468276,
+    "mean_ms": 0.7459000141049424,
+    "median_ms": 0.6271000602282584,
+    "min_ms": 0.5254000425338745,
+    "p95_ms": 1.553199952468276
   },
   "macro_avg": {
     "f1": 0.6488095238095238,
     "precision": 0.7291666666666666,
     "recall": 0.6666666666666666
   },
-  "model_name": "numpy_tfidf_logreg",
+  "model_name": "sklearn_tfidf_logreg",
   "model_path": "C:\\Users\\u.altieri\\Desktop\\UMB-github\\Real-Time-Content-Moderation-Model\\models\\baseline_tfidf_logreg.joblib",
   "per_label": {
     "abusive": {
@@ -79,19 +79,19 @@
       "support": 3
     },
     "safe": {
-      "f1": 0.5714285714285715,
-      "precision": 0.5,
-      "recall": 0.6666666666666666,
-      "support": 3
-    },
-    "toxic": {
       "f1": 0.6666666666666666,
       "precision": 0.6666666666666666,
       "recall": 0.6666666666666666,
       "support": 3
+    },
+    "toxic": {
+      "f1": 0.5714285714285715,
+      "precision": 0.5,
+      "recall": 0.6666666666666666,
+      "support": 3
     }
   },
-  "roc_auc_ovr": 0.9166666666666666,
+  "roc_auc_ovr": 0.8611111111111109,
   "split_sizes": {
     "test": 12,
     "train": 47,
