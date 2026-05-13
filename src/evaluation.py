@@ -150,6 +150,9 @@ def plot_confusion_matrix(
     path: Path,
 ) -> bool:
     try:
+        import matplotlib
+
+        matplotlib.use("Agg", force=True)
         import matplotlib.pyplot as plt
     except Exception:
         return False

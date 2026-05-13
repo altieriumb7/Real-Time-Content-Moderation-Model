@@ -46,9 +46,12 @@ def export_sklearn_baseline(model_path: Path, output_path: Path, compare_text: s
             "status": "not_exported",
             "reason": "The NumPy fallback model is not ONNX-exportable. Train with scikit-learn first.",
         }
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    onnx_model = convert_sklearn(model, initial_types=[("text", StringTensorType([None, 1]))])
-    output_path.write_bytes(onnx_model.SerializeToString())
+    try:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        onnx_model = convert_sklearn(model, initial_types=[("text", StringTensorType([None, 1]))])
+        output_path.write_bytes(onnx_model.SerializeToString())
+    except Exception as exc:
+        return {"status": "not_exported", "reason": f"Baseline ONNX conversion failed: {exc}"}
     return {"status": "exported", "onnx_path": str(output_path), "latency_comparison": None}
 
 

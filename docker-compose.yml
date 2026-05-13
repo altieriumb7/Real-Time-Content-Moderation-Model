@@ -1,0 +1,11 @@
+services:
+  moderation-app:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - MPLBACKEND=Agg
+      - DEMO_MODE=true
+      - ALLOW_LIVE_RUNS=false
+      - DEFAULT_CONFIG_PATH=evals/config.yaml
+      - REPORTS_DIR=reports

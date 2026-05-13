@@ -3,17 +3,19 @@ from __future__ import annotations
 from pathlib import Path
 
 from src.config import BASELINE_MODEL_PATH
-from src.models.baseline import BaselineModerator
 from src.models.fallback import KeywordFallbackModerator
-from src.models.transformer import TransformerModerator
 from src.schema import ModerationResult
 
 
 def load_moderator(model_path: str | Path | None = None, allow_fallback: bool = True):
     path = Path(model_path) if model_path else BASELINE_MODEL_PATH
     if path.exists() and path.is_dir():
+        from src.models.transformer import TransformerModerator
+
         return TransformerModerator.load(path)
     if path.exists():
+        from src.models.baseline import BaselineModerator
+
         return BaselineModerator.load(path)
     if allow_fallback:
         return KeywordFallbackModerator()

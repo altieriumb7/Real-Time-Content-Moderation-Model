@@ -1,176 +1,135 @@
-# Real-Time Content Moderation Model
+---
+title: LLM Red Team Evaluation Dashboard
+emoji: 🧪
+colorFrom: red
+colorTo: gray
+sdk: docker
+app_port: 8501
+pinned: false
+---
 
-Portfolio-quality NLP project for detecting toxic, abusive, or policy-violating text before it reaches users.
+# LLM Red Team Evaluation Dashboard
 
-The repository includes:
+Streamlit dashboard + CLI tools for safe public demo benchmarking and optional local live red-team evaluation runs.
 
-- Data loading with Jigsaw Toxic Comment support and a clearly marked synthetic demo fallback.
-- Preprocessing and stratified train/validation/test splitting.
-- Baseline TF-IDF + Logistic Regression classifier.
-- Lightweight transformer fine-tuning path with DistilBERT.
-- Evaluation with precision, recall, F1-score, optional ROC-AUC, confusion matrix, and inference latency.
-- CLI inference.
-- Optional ONNX export and latency comparison when dependencies are available.
-- Streamlit demo for local interactive moderation.
-- Unit tests for preprocessing, metrics, prediction behavior, and output schema.
+## Live Demo (Hugging Face Spaces)
 
-## Project Structure
+This repository is prepared for Docker-based Hugging Face Spaces deployment with **safe demo mode enabled by default**.
+
+- Public Space default: `DEMO_MODE=true`, `ALLOW_LIVE_RUNS=false`
+- No API key required for public browsing
+- Uses static sample benchmark artifacts under `reports/demo_benchmark/`
+
+## Safe Public Demo Behavior
+
+- Live API execution is blocked when `DEMO_MODE=true`.
+- Dashboard shows runtime mode and key presence (never key value).
+- Public demo benchmark is deterministic and does not call external APIs.
+- Full live evaluations are documented for local/private use.
+
+## Project Layout
 
 ```text
-data/
-  demo_toxicity.csv          # synthetic demo data, marked with is_demo=true
+app.py
 src/
-  preprocessing.py           # cleaning, label mapping, dataset loading, splits
-  evaluation.py              # metrics, confusion matrix, reports
-  inference.py               # model loading and prediction entrypoint
-  moderate.py                # CLI inference
-  train_baseline.py          # TF-IDF + Logistic Regression baseline
-  train_transformer.py       # DistilBERT fine-tuning
-  export_onnx.py             # optional ONNX export
-  models/
-models/                      # generated model artifacts
-reports/                     # generated metrics and confusion matrices
+  run_redteam.py
+  runner.py
+  generate_demo_benchmark.py
+  benchmark.py
+  runtime_settings.py
+evals/config.yaml
+benchmarks/qualitative_redteam_cases.yaml
+reports/demo_benchmark/
 tests/
-app.py                       # Streamlit demo
-requirements.txt
 ```
 
-## Setup
+## Local Setup
 
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
-python -m pip install -r requirements.txt
-```
-
-On macOS/Linux, activate with:
-
-```bash
-source .venv/bin/activate
-```
-
-## Data
-
-By default, training looks for:
-
-1. A user-provided CSV via `--dataset`.
-2. Jigsaw data at `data/jigsaw/train.csv`.
-3. The synthetic demo dataset at `data/demo_toxicity.csv`.
-
-Expected custom CSV columns:
-
-- `text` or `comment_text`
-- `label`
-
-Supported labels:
-
-- `safe`
-- `toxic`
-- `abusive`
-- `policy_violation`
-
-The included `data/demo_toxicity.csv` is synthetic demo data. It is useful for exercising the pipeline, but it should not be treated as evidence of production moderation quality.
-
-## Train Baseline
-
-```bash
-python -m src.train_baseline
-```
-
-This writes:
-
-- `models/baseline_tfidf_logreg.joblib`
-- `reports/baseline_metrics.json`
-- `reports/confusion_matrix.csv`
-- `reports/model_comparison.json`
-
-If scikit-learn is unavailable, the script uses a dependency-light NumPy TF-IDF + logistic regression fallback so the pipeline remains runnable.
-
-## Train Transformer
-
-```bash
-python -m src.train_transformer --model-name distilbert-base-uncased --epochs 2
-```
-
-This requires the Hugging Face dependencies in `requirements.txt` and internet access unless the model is already cached locally. If you need authenticated Hugging Face access, use environment variables such as `HF_TOKEN`; the app and scripts do not require private credentials for the local demo.
-
-Transformer metrics are written to:
-
-```text
-reports/transformer_metrics.json
-```
-
-After both baseline and transformer metrics exist, rerun baseline training or update `reports/model_comparison.json` to compare the computed scores and latency summaries.
-
-## Evaluate
-
-```bash
-python -m src.evaluate --model-path models/baseline_tfidf_logreg.joblib
-```
-
-Metrics include precision, recall, F1-score, optional ROC-AUC, confusion matrix, and latency. ROC-AUC is only reported when probability outputs and the required metric dependencies are available.
-
-## CLI Inference
-
-```bash
-python -m src.moderate --text "example text"
-```
-
-JSON output:
-
-```bash
-python -m src.moderate --text "example text" --json
-```
-
-To fail instead of using the untrained keyword fallback:
-
-```bash
-python -m src.moderate --text "example text" --no-fallback
-```
-
-## Streamlit Demo
-
-```bash
+pip install -r requirements.txt
 streamlit run app.py
 ```
 
-The demo shows:
-
-- Text input box
-- Predicted class
-- Confidence score
-- Probability distribution across labels
-- Inference latency
-- Three preloaded examples
-- Confusion matrix from evaluation
-- F1-score and precision/recall summary
-- Short explanation of what the model detected
-
-## Optional ONNX Export
+## Docker Setup
 
 ```bash
-python -m src.export_onnx
+docker build -t llm-redteam .
+docker run --rm -p 8501:8501 --env-file .env llm-redteam
 ```
 
-For transformer artifacts, this exports a PyTorch model to ONNX and compares PyTorch vs ONNX latency when `onnxruntime` is installed. For scikit-learn baseline artifacts, it attempts conversion through `skl2onnx`. The NumPy fallback baseline is intentionally not ONNX-exportable.
+## Hugging Face Spaces Deployment (Docker SDK)
 
-## Tests
+1. Create a new Space.
+2. Select **SDK: Docker**.
+3. Push this repo.
+4. Set Variables:
+   - `DEMO_MODE=true`
+   - `ALLOW_LIVE_RUNS=false`
+   - `DEFAULT_CONFIG_PATH=evals/config.yaml`
+   - `REPORTS_DIR=reports`
+5. Optional Secret:
+   - `OPENAI_API_KEY` (only for private live runs; keep disabled in public demo)
+
+## CLI
+
+Generate deterministic demo benchmark:
 
 ```bash
-python -m unittest discover -s tests
+python -m src.generate_demo_benchmark
 ```
 
-or, after installing pytest:
+Run benchmark driver (config-based):
 
 ```bash
-pytest
+python -m src.run_redteam --config evals/config.yaml
 ```
+
+Optional local live run (consumes credits):
+
+```bash
+set DEMO_MODE=false
+set ALLOW_LIVE_RUNS=true
+set OPENAI_API_KEY=...
+python -m src.run_redteam --config evals/config.yaml --mode live
+```
+
+## Benchmark
+
+Demo benchmark fixtures: `benchmarks/qualitative_redteam_cases.yaml`  
+Generated demo artifacts:
+
+- `reports/demo_benchmark/demo_results.json`
+- `reports/demo_benchmark/demo_summary.csv`
+- `reports/demo_benchmark/qualitative_case_gallery.md`
+
+Metrics include:
+
+- total cases
+- pass/fail/warning counts
+- pass rate
+- category coverage
+
+## Security
+
+- Do not commit `.env` or API keys.
+- Use `OPENAI_API_KEY` only through environment variables or session-only dashboard input.
+- Session key is not persisted to disk.
+- Public mode disables live calls by default.
 
 ## Limitations
 
-- The bundled dataset is synthetic demo data and is not representative of production traffic.
-- Metrics in `reports/` are generated by the code; do not cite scores until you have run training/evaluation on your target dataset.
-- Toxicity and policy labels are simplified into four classes for demonstration.
-- Real moderation systems need stronger datasets, human review workflows, abuse monitoring, threshold tuning, multilingual testing, drift checks, and appeal processes.
-- The demo can run locally without private credentials.
+- Hugging Face Spaces free storage is ephemeral.
+- Demo benchmark results are illustrative sample artifacts.
+- Live benchmark execution requires valid API credentials and network access.
+- Docker image runtime on Space depends on Space resource/network policy.
 
+## CV / Portfolio Positioning
+
+This project demonstrates:
+
+- safe public AI evaluation UX design
+- reproducible benchmark artifact generation
+- deployment-ready Streamlit + Docker packaging
+- controlled live-eval gating for cost and key safety

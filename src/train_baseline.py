@@ -53,7 +53,7 @@ def main() -> None:
     for text in test_texts:
         result = moderator.predict(text)
         predictions.append(result.predicted_label)
-        probabilities.append([result.probabilities[label] for label in LABELS])
+        probabilities.append([result.probabilities.get(label, 0.0) for label in LABELS])
         latencies.append(result.latency_ms)
 
     metrics = evaluate_predictions(

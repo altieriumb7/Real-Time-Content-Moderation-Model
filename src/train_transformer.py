@@ -7,7 +7,6 @@ import time
 from pathlib import Path
 
 import numpy as np
-import torch
 
 from src.comparison import update_model_comparison
 from src.config import (
@@ -18,20 +17,6 @@ from src.config import (
 )
 from src.evaluation import evaluate_predictions, write_json_report
 from src.preprocessing import load_records, split_texts_labels, stratified_split, summarize_records
-
-
-class ModerationTorchDataset(torch.utils.data.Dataset):
-    def __init__(self, encodings, labels: list[str]) -> None:
-        self.encodings = encodings
-        self.labels = [LABELS.index(label) for label in labels]
-
-    def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
-        item = {key: torch.tensor(value[idx]) for key, value in self.encodings.items()}
-        item["labels"] = torch.tensor(self.labels[idx], dtype=torch.long)
-        return item
-
-    def __len__(self) -> int:
-        return len(self.labels)
 
 
 def parse_args() -> argparse.Namespace:
@@ -49,6 +34,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     try:
+        import torch
         from transformers import (
             AutoModelForSequenceClassification,
             AutoTokenizer,
@@ -61,6 +47,19 @@ def main() -> None:
             "Install requirements.txt and retry."
         ) from exc
 
+    class ModerationTorchDataset(torch.utils.data.Dataset):
+        def __init__(self, encodings, labels: list[str]) -> None:
+            self.encodings = encodings
+            self.labels = [LABELS.index(label) for label in labels]
+
+        def __getitem__(self, idx: int) -> dict[str, torch.Tensor]:
+            item = {key: torch.tensor(value[idx]) for key, value in self.encodings.items()}
+            item["labels"] = torch.tensor(self.labels[idx], dtype=torch.long)
+            return item
+
+        def __len__(self) -> int:
+            return len(self.labels)
+
     args = parse_args()
     records = load_records(args.dataset)
     if args.max_samples:
@@ -70,13 +69,19 @@ def main() -> None:
     val_texts, val_labels = split_texts_labels(val_records)
     test_texts, test_labels = split_texts_labels(test_records)
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
-    model = AutoModelForSequenceClassification.from_pretrained(
-        args.model_name,
-        num_labels=len(LABELS),
-        id2label={idx: label for idx, label in enumerate(LABELS)},
-        label2id={label: idx for idx, label in enumerate(LABELS)},
-    )
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+        model = AutoModelForSequenceClassification.from_pretrained(
+            args.model_name,
+            num_labels=len(LABELS),
+            id2label={idx: label for idx, label in enumerate(LABELS)},
+            label2id={label: idx for idx, label in enumerate(LABELS)},
+        )
+    except Exception as exc:
+        raise RuntimeError(
+            "Unable to load transformer artifacts. Ensure internet access or a locally cached model, "
+            "and set HF_TOKEN if required."
+        ) from exc
     train_dataset = ModerationTorchDataset(
         tokenizer(train_texts, truncation=True, padding=True, max_length=args.max_length),
         train_labels,
@@ -169,4 +174,7 @@ def softmax_np(logits: np.ndarray) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except RuntimeError as exc:
+        raise SystemExit(str(exc))

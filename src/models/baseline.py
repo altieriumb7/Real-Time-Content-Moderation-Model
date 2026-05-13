@@ -4,12 +4,10 @@ import time
 from pathlib import Path
 from typing import Any
 
-import joblib
-
 from src.config import BASELINE_MODEL_PATH, LABELS
+from src.models.numpy_tfidf import NumpyTfidfLogReg
 from src.preprocessing import clean_text
 from src.schema import ModerationResult, explanation_for
-from src.models.numpy_tfidf import NumpyTfidfLogReg
 
 
 def train_numpy_baseline(
@@ -79,6 +77,8 @@ def infer_label_order(model: Any) -> list[str]:
 
 
 def save_baseline(model: Any, model_type: str, path: Path = BASELINE_MODEL_PATH) -> None:
+    import joblib
+
     path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump({"model": model, "model_type": model_type, "labels": infer_label_order(model)}, path)
 
@@ -96,6 +96,8 @@ class BaselineModerator:
 
     @classmethod
     def load(cls, path: Path = BASELINE_MODEL_PATH) -> "BaselineModerator":
+        import joblib
+
         artifact = joblib.load(path)
         if isinstance(artifact, dict):
             return cls(

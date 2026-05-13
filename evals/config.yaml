@@ -1,0 +1,8 @@
+mode: demo
+benchmark_cases_path: benchmarks/qualitative_redteam_cases.yaml
+provider:
+  endpoint: https://api.openai.com/v1/chat/completions
+  model_name: gpt-4o-mini
+  temperature: 0.0
+  timeout_seconds: 60
+  system_prompt: "You are a careful, policy-compliant assistant."
