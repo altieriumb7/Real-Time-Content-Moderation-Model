@@ -15,6 +15,7 @@ def _as_bool(value: str | None, default: bool) -> bool:
 class RuntimeSettings:
     demo_mode: bool
     allow_live_runs: bool
+    visitor_live_runs: bool
     default_config_path: Path
     reports_dir: Path
     benchmark_mode: str
@@ -35,6 +36,7 @@ def load_runtime_settings(env: dict[str, str] | None = None) -> RuntimeSettings:
     return RuntimeSettings(
         demo_mode=_as_bool(raw.get("DEMO_MODE"), True),
         allow_live_runs=_as_bool(raw.get("ALLOW_LIVE_RUNS"), False),
+        visitor_live_runs=_as_bool(raw.get("VISITOR_LIVE_RUNS"), True),
         default_config_path=Path(default_config),
         reports_dir=Path(reports_dir),
         benchmark_mode=benchmark_mode,

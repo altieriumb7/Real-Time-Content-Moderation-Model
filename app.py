@@ -50,6 +50,7 @@ def main() -> None:
         st.write(f"Current mode: `{settings.mode}`")
         st.write(f"DEMO_MODE: `{settings.demo_mode}`")
         st.write(f"ALLOW_LIVE_RUNS: `{settings.allow_live_runs}`")
+        st.write(f"VISITOR_LIVE_RUNS: `{settings.visitor_live_runs}`")
         st.write(f"OPENAI_API_KEY present: `{bool(settings.openai_api_key)}`")
         st.write(f"DEFAULT_CONFIG_PATH: `{settings.default_config_path}`")
         st.write(f"REPORTS_DIR: `{settings.reports_dir}`")
@@ -64,7 +65,7 @@ def main() -> None:
         else:
             st.warning("No config files found under `evals/`.")
 
-        session_api_key = st.text_input("Session API key (not persisted)", type="password")
+        session_api_key = st.text_input("Visitor session API key (not persisted)", type="password")
         if session_api_key:
             st.session_state["session_api_key"] = session_api_key
 
@@ -104,8 +105,8 @@ def main() -> None:
 
     if settings.demo_mode:
         st.warning(
-            "Public demo mode: live model calls are disabled. "
-            "This demo uses sample benchmark reports. Clone the repo and set OPENAI_API_KEY to run full evaluations."
+            "Public demo mode: sample benchmark reports are shown by default. "
+            "Visitors can run live evaluation only by entering their own session API key when visitor live runs are enabled."
         )
 
     metrics = load_json(BASELINE_METRICS_PATH)
@@ -179,9 +180,17 @@ def main() -> None:
         st.subheader("Benchmark & Qualitative Evaluation")
         st.caption("Hosted public demo uses static demo reports. Live runs may consume API credits.")
 
-        effective_key = st.session_state.get("session_api_key") or settings.openai_api_key
-        if not has_api_key(settings, st.session_state.get("session_api_key")):
-            st.info("No API key detected. Demo benchmark remains available; live benchmark execution is disabled.")
+        session_key = st.session_state.get("session_api_key")
+        effective_key = session_key or settings.openai_api_key
+        visitor_live_allowed = settings.demo_mode and settings.visitor_live_runs and bool(session_key)
+        configured_live_allowed = (not settings.demo_mode) and settings.allow_live_runs
+        live_allowed = visitor_live_allowed or configured_live_allowed
+
+        if not has_api_key(settings, session_key):
+            st.info(
+                "No API key detected. Demo benchmark remains available. "
+                "To test live evaluation, enter your own API key in the sidebar; it is kept only in this session."
+            )
 
         if not selected_report_path:
             st.warning("No benchmark report selected.")
@@ -257,16 +266,23 @@ def main() -> None:
                 )
 
         live_disabled_reason = None
-        if settings.demo_mode:
-            live_disabled_reason = "DEMO_MODE=true"
-        elif not settings.allow_live_runs:
-            live_disabled_reason = "ALLOW_LIVE_RUNS=false"
+        if not live_allowed:
+            if settings.demo_mode and not settings.visitor_live_runs:
+                live_disabled_reason = "VISITOR_LIVE_RUNS=false"
+            elif settings.demo_mode and not session_key:
+                live_disabled_reason = "enter a visitor session API key"
+            elif not settings.allow_live_runs:
+                live_disabled_reason = "ALLOW_LIVE_RUNS=false"
 
         if live_disabled_reason:
             st.info(f"Live benchmark execution disabled: {live_disabled_reason}")
         else:
-            st.warning("Running live benchmark may consume API credits.")
+            st.warning("Running live benchmark uses the provided API key and may consume that account's API credits.")
+            user_confirmed_cost = st.checkbox("I understand this live run may consume API credits.")
             if st.button("Run live benchmark (may consume API credits)"):
+                if not user_confirmed_cost:
+                    st.error("Confirm the credit-use warning before running live evaluation.")
+                    return
                 if not effective_key:
                     st.error("OPENAI_API_KEY missing. Add secret env var or enter session key in sidebar.")
                 elif not selected_config:

@@ -19,10 +19,12 @@ This repository is prepared for Docker-based Hugging Face Spaces deployment with
 - Public Space default: `DEMO_MODE=true`, `ALLOW_LIVE_RUNS=false`
 - No API key required for public browsing
 - Uses static sample benchmark artifacts under `reports/demo_benchmark/`
+- Visitors can optionally run live evaluation with their own session-only API key when `VISITOR_LIVE_RUNS=true`
 
 ## Safe Public Demo Behavior
 
 - Live API execution is blocked when `DEMO_MODE=true`.
+- In demo mode, visitor live execution is allowed only with a visitor-provided session key and an explicit credit-use confirmation.
 - Dashboard shows runtime mode and key presence (never key value).
 - Public demo benchmark is deterministic and does not call external APIs.
 - Full live evaluations are documented for local/private use.
@@ -67,10 +69,11 @@ docker run --rm -p 8501:8501 --env-file .env llm-redteam
 4. Set Variables:
    - `DEMO_MODE=true`
    - `ALLOW_LIVE_RUNS=false`
+   - `VISITOR_LIVE_RUNS=true`
    - `DEFAULT_CONFIG_PATH=evals/config.yaml`
    - `REPORTS_DIR=reports`
 5. Optional Secret:
-   - `OPENAI_API_KEY` (only for private live runs; keep disabled in public demo)
+   - `OPENAI_API_KEY` (optional for private live runs; not needed for visitor-provided session keys)
 
 ## CLI
 
@@ -95,6 +98,8 @@ set OPENAI_API_KEY=...
 python -m src.run_redteam --config evals/config.yaml --mode live
 ```
 
+On the public dashboard, visitors can enter their own key in the sidebar. The key is stored only in Streamlit session state and is not written to disk.
+
 ## Benchmark
 
 Demo benchmark fixtures: `benchmarks/qualitative_redteam_cases.yaml`  
@@ -116,7 +121,7 @@ Metrics include:
 - Do not commit `.env` or API keys.
 - Use `OPENAI_API_KEY` only through environment variables or session-only dashboard input.
 - Session key is not persisted to disk.
-- Public mode disables live calls by default.
+- Public mode shows demo reports by default. Visitor live calls require `VISITOR_LIVE_RUNS=true`, a session key, and explicit confirmation.
 
 ## Limitations
 

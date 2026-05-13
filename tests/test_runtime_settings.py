@@ -9,6 +9,7 @@ class RuntimeSettingsTests(unittest.TestCase):
         settings = load_runtime_settings({})
         self.assertTrue(settings.demo_mode)
         self.assertFalse(settings.allow_live_runs)
+        self.assertTrue(settings.visitor_live_runs)
         self.assertEqual(settings.default_config_path, Path("evals/config.yaml"))
         self.assertEqual(settings.reports_dir, Path("reports"))
 

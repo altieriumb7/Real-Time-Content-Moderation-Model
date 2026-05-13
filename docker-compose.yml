@@ -7,5 +7,6 @@ services:
       - MPLBACKEND=Agg
       - DEMO_MODE=true
       - ALLOW_LIVE_RUNS=false
+      - VISITOR_LIVE_RUNS=true
       - DEFAULT_CONFIG_PATH=evals/config.yaml
       - REPORTS_DIR=reports
