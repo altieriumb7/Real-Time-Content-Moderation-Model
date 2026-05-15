@@ -1,5 +1,5 @@
 ---
-title: LLM Red Team Evaluation Dashboard
+title: Real-Time Content Moderation Dashboard
 emoji: 🧪
 colorFrom: red
 colorTo: gray
